@@ -1,3 +1,5 @@
+// An example for custom handlers.
+
 module.exports = (req, res) => {
 
 	res.write('-');
