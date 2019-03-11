@@ -1,21 +1,33 @@
 #!/usr/bin/env node
 
 // Imports
-let http = require('http');
+const http = require('http');
+const Argv = require('process').argv;
 
 // Options
-let port = parseInt(require('process').argv[2] || 80);
+const port = parseInt(Argv[2] || 80);
+const pretty = ((Argv[3] || 'y') === 'y');
 
-// Main
-http.createServer(function (req, res, next) {
+/* Helpers */
+const stringify = pretty ?
+	(Obj) => JSON.stringify(Obj, null, 2) :
+	(Obj) => JSON.stringify(Obj);
+
+const logToConsole = pretty ?
+	(Obj) => console.dir(Obj, {depth: null, colors: true}) :
+	(Obj) => console.log(stringify(Obj));
+
+const defaultHandler = (req, res, next) => {
 
 	let { url, headers } = req;
 	let Ret = { url, headers };
 
-	console.dir(Ret, {depth: null, colors: true});
+	logToConsole(Ret);
 
-	res.write(JSON.stringify(Ret, null, 2));
+	res.write(stringify(Ret));
 	res.statusCode = 200;
 	res.end();
+}
 
-}).listen(port);
+// Main
+http.createServer(defaultHandler).listen(port);
